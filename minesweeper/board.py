@@ -83,8 +83,10 @@ class Board:
             self.values.append(textSurface)
 
         # accounting
+        self.visibleCount = 0
         self.mineCount = 0
         self.flagCount = 0
+
 
     def get(self, x, y):
         """returns the node at board position x, y
@@ -113,7 +115,10 @@ class Board:
         return self.get(x, y) & VISIBLE
 
     def setVisible(self, x, y):
-        return self._set(x, y, VISIBLE)
+        if not self.isVisible(x, y) and self._set(x, y, VISIBLE):
+            self.visibleCount += 1
+            return True
+        return False
 
     def hasMine(self, x, y):
         return self.get(x, y) & MINE
@@ -159,7 +164,7 @@ class Board:
         if not self.isVisible(x, y):
             self.dirty = True
             if self.hasMine(x, y):  # we lose
-                # todo: update board
+                self.setVisible(x, y)
                 return 'mine'
 
             # no mines, so flood fill
