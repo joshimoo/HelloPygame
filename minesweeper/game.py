@@ -42,6 +42,12 @@ def main():
     pygame.display.set_caption('Minesweeper')
     FPS_CLOCK = pygame.time.Clock()
 
+    # todo: implement real stateManagment
+    while True:
+        runGame()
+
+
+def runGame():
     # mouse handling
     mouseLeftClicked = False
     mouseRightClicked = False
@@ -51,6 +57,10 @@ def main():
     # board
     board = minesweeper.board.createRandomBoard()
 
+    # game state
+    gameOver = False
+    gameWon = False
+
     # game loop
     while True:
 
@@ -58,6 +68,11 @@ def main():
         for event in pygame.event.get():
             if event.type == QUIT:
                 terminate()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    terminate()
+                elif event.key == K_r:
+                    return 'reset'  # we return, which will start a new game
             elif event.type == MOUSEBUTTONDOWN:
                 # event.button: number value representing the mouse button pressed or released
                 # event.pos: X,Y mouse position when the button was pressed or released
@@ -69,18 +84,30 @@ def main():
                     mouseRightClicked = True
 
         # update state
-        if mouseLeftClicked: # uncover
-            # transform screen coords into board coords
-            boardX, boardY = screenCordsToBoardCoords(board, mouseX, mouseY)
-            board.uncover(boardX, boardY)
-            mouseLeftClicked = False
+        if not gameOver and not gameWon: # game play
+            if mouseLeftClicked: # uncover
+                # transform screen coords into board coords
+                boardX, boardY = screenCordsToBoardCoords(board, mouseX, mouseY)
+                result = board.uncover(boardX, boardY)
+                if result == 'mine':
+                    gameOver = True
+                elif result == 'done':
+                    gameWon = True
+                mouseLeftClicked = False
 
-        if mouseRightClicked: # flag
-            # transform screen coords into board coords
-            boardX, boardY = screenCordsToBoardCoords(board, mouseX, mouseY)
-            board.setFlag(boardX, boardY)
-            mouseRightClicked = False
+            if mouseRightClicked: # flag
+                # transform screen coords into board coords
+                boardX, boardY = screenCordsToBoardCoords(board, mouseX, mouseY)
+                board.toggleFlag(boardX, boardY)
+                mouseRightClicked = False
 
+        elif gameOver:
+            # todo: game over do something
+            pass
+
+        elif gameWon:
+            # todo: game won do something
+            pass
 
         # draw board
         DISPLAY_SURFACE.fill(BACKGROUND_COLOR)

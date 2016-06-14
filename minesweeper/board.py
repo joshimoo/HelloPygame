@@ -169,6 +169,9 @@ class Board:
 
             # no mines, so flood fill
             self.floodFill(x, y)
+            targetCount = (self.width * self.height) - self.mineCount
+            if self.visibleCount == targetCount:
+                return 'done'
 
         return self.get(x, y)
 
