@@ -127,6 +127,11 @@ class Board:
     def hasFlag(self, x, y):
         return self.get(x, y) & FLAG
 
+    def toggleFlag(self, x, y):
+        if self.hasFlag(x, y):
+            return self.removeFlag(x, y)
+        return self.setFlag(x, y)
+
     def setFlag(self, x, y):
         if not self.hasFlag(x, y) and self._set(x, y, FLAG):
             self.flagCount += 1
