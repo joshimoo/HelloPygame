@@ -26,7 +26,10 @@ assert WINDOW_WIDTH % CELL_SIZE == 0, 'Window width must be a multiple of cell s
 assert WINDOW_HEIGHT % CELL_SIZE == 0, 'Window height must be a multiple of cell size.'
 
 # color
-BACKGROUND_COLOR = (0, 0, 0)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BACKGROUND_COLOR = BLACK
 
 # globals
 DISPLAY_SURFACE = None
@@ -41,10 +44,31 @@ def main():
     DISPLAY_SURFACE = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption('Minesweeper')
     FPS_CLOCK = pygame.time.Clock()
+    BASIC_FONT = pygame.font.Font('freesansbold.ttf', BASIC_FONT_SIZE)
 
     # todo: implement real stateManagment
+    # todo: create startGame state, in which user can select board size and game difficulty
     while True:
         runGame()
+
+
+def makeText(text, color):
+    # render(text, antialias, color, background=None) -> Surface)
+    textSurface = BASIC_FONT.render(text, True, color)
+    textRect = textSurface.get_rect()
+    return textSurface, textRect
+
+
+def drawGameOver():
+    textSurface, textRect = makeText('Game Over!!!', RED)
+    textRect.center = (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
+    DISPLAY_SURFACE.blit(textSurface, textRect)
+
+
+def drawGameWon():
+    textSurface, textRect = makeText('You Won!!!', GREEN)
+    textRect.center = (int(WINDOW_WIDTH / 2), int(WINDOW_HEIGHT / 2))
+    DISPLAY_SURFACE.blit(textSurface, textRect)
 
 
 def runGame():
@@ -55,7 +79,7 @@ def runGame():
     mouseY = 0
 
     # board
-    board = minesweeper.board.createRandomBoard()
+    board = minesweeper.board.createRandomBoard(WINDOW_WIDTH, WINDOW_HEIGHT)
 
     # game state
     gameOver = False
@@ -101,23 +125,30 @@ def runGame():
                 board.toggleFlag(boardX, boardY)
                 mouseRightClicked = False
 
-        elif gameOver:
-            # todo: game over do something
-            pass
-
-        elif gameWon:
-            # todo: game won do something
-            pass
-
         # draw board
         DISPLAY_SURFACE.fill(BACKGROUND_COLOR)
         (boardSurface, boardRect) = board.draw()
         DISPLAY_SURFACE.blit(boardSurface, boardRect)
+
+        # draw game state specifics
+        if gameOver:
+            # todo: game over do something
+            drawGameOver()
+        elif gameWon:
+            # todo: game won do something
+            drawGameWon()
+        else:
+            # todo: create some nice UI, which displays flag count, solved percentage etc
+            pass
+
+        # draw to screen
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
 
 
 def screenCordsToBoardCoords(board, screenX, screenY):
+    # todo: put the board into a specific position and transform and scale accordingly
+    # todo: so that it allways fills that specific area, irregardless of cell count
     boardX = int(screenX / board.CELL_WIDTH)
     boardY = int(screenY / board.CELL_HEIGHT)
     return boardX, boardY

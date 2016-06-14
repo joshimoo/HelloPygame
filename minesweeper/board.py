@@ -29,8 +29,12 @@ CELL_SIZE = 20
 MINE_CHANCE = 0.05
 
 
-def createRandomBoard():
-    return createBoard(random.randint(9, 9), random.randint(9, 9), random.randint(5, 15))
+def createRandomBoard(windowWidth, windowHeight):
+    maxX = int(windowWidth / CELL_SIZE)
+    maxY = int(windowHeight/ CELL_SIZE)
+    maxSize = min(maxX, maxY)
+    size = random.randint(9, maxSize)
+    return createBoard(size, size, random.randint(5, 15))
 
 
 def createBoard(width, height, mineCount=None, flagLimit=None):
