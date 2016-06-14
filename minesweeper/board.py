@@ -189,29 +189,31 @@ class Board:
     def floodFill(self, x, y):
         # only process valid locations
         if not self.validLocation(x, y):
-            return None
+            return 0
 
         # we only process nodes that we have not visited before
         # since visible internally checks isValidLocation
         # it could return false, therefore we require
         # an explicit check of isValidLocation at the method entry
         if self.isVisible(x, y):
-            return None
+            return 0
 
         # process cell
         self.setVisible(x, y)
         self.removeFlag(x, y)
+        visited = 1
         mineCount = self.countMines(x, y)
         if mineCount > 0:  # set count and stop
             self.setMineCount(x, y, mineCount)
-            return mineCount
+        else:  # flood fill neighbours
+            for yOffset in range(-1, 2, 1):
+                for xOffset in range(-1, 2, 1):
+                    if (x + xOffset == x) and (y + yOffset == y):
+                        continue
+                    visited += self.floodFill(x + xOffset, y + yOffset)
 
-        # flood fill neighbours
-        for yOffset in range(-1, 2, 1):
-            for xOffset in range(-1, 2, 1):
-                if (x + xOffset == x) and (y + yOffset == y):
-                    continue
-                self.floodFill(x + xOffset, y + yOffset)
+        # return how many nodes we uncovered
+        return visited
 
     def drawMineCount(self, surface, cellRect, mineCount):
         surface.blit(self.values[mineCount], cellRect)
